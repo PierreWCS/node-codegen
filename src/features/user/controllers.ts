@@ -8,11 +8,11 @@ import {
 import {Database} from '../../lib/Database';
 import {ObjectId} from 'mongodb';
 
-const find = async (id: QueryGetUserArgs['id']) => {
+const find = async (id: QueryGetUserArgs['id']): Promise<User> => {
   try {
     const userCollection = Database.getCollection<User>('user');
-    const foundUser = await userCollection.findOne({_id: new ObjectId(id)});
-    return foundUser;
+    const user = await userCollection.findOne({_id: new ObjectId(id)});
+    return {...user, id: user?._id.toString()};
   } catch (error) {
     throw error;
   }
@@ -22,32 +22,35 @@ const create = async (args: CreateUserInput): Promise<User> => {
   try {
     const userCollection = Database.getCollection<User>('user');
     const createdUser = await userCollection.insertOne(args);
-    return {...args, _id: createdUser.insertedId};
+    return {...args, id: createdUser.insertedId.toString()};
   } catch (error) {
     throw error;
   }
 };
 
-const update = async (updatedUser: EditUserInput) => {
+const update = async (updatedUser: EditUserInput): Promise<User> => {
   try {
     const userCollection = Database.getCollection<User>('user');
-    return await userCollection.findOneAndUpdate(
-      {_id: new ObjectId(updatedUser._id)},
+    const user = await userCollection.findOneAndUpdate(
+      {_id: new ObjectId(updatedUser.id)},
       updatedUser,
     );
+    return {...user, id: user.value?._id.toString()};
   } catch (error) {
     throw error;
   }
 };
 
-const remove = async (id: MutationDeleteUserArgs['id']) => {
+const remove = async (id: MutationDeleteUserArgs['id']): Promise<string> => {
   try {
     const userCollection = Database.getCollection<User>('user');
-    const deletedUserId = (
-      await userCollection.findOneAndDelete({
-        _id: new ObjectId(id),
-      })
-    ).value?._id;
+    const deletedUser = await userCollection.findOneAndDelete({
+      _id: new ObjectId(id),
+    });
+    const deletedUserId = deletedUser.value?._id.toString();
+    if (!deletedUserId) {
+      throw new Error('UserNotFound');
+    }
     return deletedUserId;
   } catch (error) {
     throw error;

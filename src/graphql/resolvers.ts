@@ -1,13 +1,13 @@
 import {
   Mutations as UserMutations,
   Queries as UserQueries,
-} from "../features/user";
+} from '../features/user';
 import {
   Mutations as ProductMutations,
   Queries as ProductQueries,
-} from "../features/product";
-import {Resolvers} from "./generated";
-import * as scalars from "./scalars";
+} from '../features/product';
+import {Resolvers} from './generated';
+// import * as scalars from './scalars';
 
 export const resolvers: Resolvers = {
   Query: {
@@ -18,5 +18,5 @@ export const resolvers: Resolvers = {
     ...UserMutations,
     ...ProductMutations,
   },
-  ...scalars,
+  // ...scalars,
 };

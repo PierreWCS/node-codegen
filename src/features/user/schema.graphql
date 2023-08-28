@@ -5,11 +5,11 @@ type Query {
 type Mutation {
   createUser(args: CreateUserInput!): User
   editUser(args: EditUserInput!): User
-  deleteUser(id: String!): ObjectId
+  deleteUser(id: String!): String
 }
 
 type User {
-  _id: ObjectId
+  id: String
   firstname: String
   birthdate: String
   gender: String
@@ -20,7 +20,7 @@ input CreateUserInput {
   gender: String
 }
 input EditUserInput {
-  _id: String!
+  id: String!
   firstname: String
   birthdate: String
   gender: String

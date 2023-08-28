@@ -6,12 +6,11 @@ import {UserController} from './controllers';
 import {User, CreateUserInput} from '../../graphql/generated';
 import {resolvers} from '../../graphql';
 import {getMergedTypeDefs} from '../../graphql/typeDefs';
-import {ObjectId} from 'mongodb';
 
 const GET_USER = `#graphql
   query GetUser($id: String!) {
     getUser(id: $id) {
-      _id
+      id
       firstname
       birthdate
       gender
@@ -21,7 +20,7 @@ const GET_USER = `#graphql
 const CREATE_USER = `#graphql
   mutation CreateUser($args: CreateUserInput!) {
     createUser(args: $args) {
-      _id
+      id
       firstname
       birthdate
       gender
@@ -50,8 +49,11 @@ describe('User', () => {
   });
 
   afterAll(async () => {
-    await Database.drop();
     await Database.disconnect();
+  });
+
+  afterEach(async () => {
+    await Database.drop();
   });
 
   it('should get a user', async () => {
@@ -65,15 +67,14 @@ describe('User', () => {
       schema: schema,
       source: GET_USER,
       variableValues: {
-        id: user._id.toString(),
+        id: user.id,
       },
     });
     if (errors) {
       console.log('errors in <should get a user>', errors);
     }
 
-    expect((data?.getUser as User)._id.toString()).toBe(user._id.toString());
-    await UserController.remove(user._id.toString());
+    expect((data?.getUser as User).id).toBe(user.id);
   });
 
   it('should create a user', async () => {
@@ -96,9 +97,6 @@ describe('User', () => {
 
     expect(createdUser).not.toBe(null);
     expect(createdUser.firstname).toBe(createUserArgs.firstname);
-    await Database.getCollection('user').findOneAndDelete({
-      _id: createdUser._id,
-    });
   });
 
   it('should delete a user', async () => {
@@ -111,14 +109,14 @@ describe('User', () => {
       schema: schema,
       source: DELETE_USER,
       variableValues: {
-        id: user._id.toString(),
+        id: user.id,
       },
     });
     if (errors) {
       console.log('errors in <should delete a user>', errors);
     }
-    const deletedUserId: ObjectId = data?.deleteUser as User['_id'];
+    const deletedUserId = data?.deleteUser as User['id'];
 
-    expect(deletedUserId.toString()).toBe(user._id.toString());
+    expect(deletedUserId).toBe(user.id);
   });
 });

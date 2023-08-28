@@ -7,7 +7,7 @@ type Mutation {
 }
 
 type Product {
-  _id: ObjectId
+  id: String
   name: String
   description: String
 }
