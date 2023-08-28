@@ -50,6 +50,7 @@ describe('User', () => {
   });
 
   afterAll(async () => {
+    await Database.drop();
     await Database.disconnect();
   });
 

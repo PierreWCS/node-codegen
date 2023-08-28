@@ -34,6 +34,13 @@ export const Database = (() => {
     await connectionInstance.close();
   };
 
+  const drop = async () => {
+    if (!db) {
+      throw new Error('Not connected to MongoDB');
+    }
+    await db.dropDatabase();
+  };
+
   const getInstance = async () => {
     if (connectionInstance) {
       return connectionInstance;
@@ -69,5 +76,6 @@ export const Database = (() => {
     getInstance,
     getDb,
     getCollection,
+    drop,
   };
 })();
